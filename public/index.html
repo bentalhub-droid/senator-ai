@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenatorAI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                🤖 SenatorAI
+            </div>
+
+            <button id="newChat" class="new-chat">
+                + New Chat
+            </button>
+
+            <div class="chat-history">
+                <p>Recent Chats</p>
+            </div>
+
+        </aside>
+
+        <main class="main">
+
+            <header class="topbar">
+                <h2>SenatorAI</h2>
+            </header>
+
+            <section id="chat-messages" class="messages">
+
+                <div class="welcome">
+
+                    <div class="welcome-icon">
+                        🤖
+                    </div>
+
+                    <h1>Hello, I'm SenatorAI</h1>
+
+                    <p>
+                        Your intelligent AI assistant. Ask me anything.
+                    </p>
+
+                </div>
+
+            </section>
+
+            <div class="input-container">
+
+                <form id="chat-form" class="input-box">
+
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Message SenatorAI..."
+                        autocomplete="off"
+                    >
+
+                    <button type="submit">
+                        Send
+                    </button>
+
+                </form>
+
+                <p class="disclaimer">
+                    SenatorAI can make mistakes. Check important information.
+                </p>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
