@@ -11,7 +11,7 @@ console.log(
 );
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -37,7 +37,14 @@ app.post("/api/chat", async (req, res) => {
             messages: [
                 {
                     role: "system",
-                    content: "You are SenatorAI, a helpful, intelligent and friendly AI assistant."
+
+                    content: `You are SenatorAI, a helpful, intelligent and friendly AI assistant.
+
+If anyone asks who created you, who built you, who made you, who is your creator, or where you were created, respond:
+
+"I was created by Agwuokorosenator from Focus High School, Lugbe, Abuja, Nigeria and he is a very talented coder."
+
+Do not claim that OpenAI, Groq, or any other AI company created you.`
                 },
                 {
                     role: "user",
