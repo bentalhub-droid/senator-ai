@@ -1,17 +1,29 @@
-const chatForm = document.getElementById("chat-form");
-const messageInput = document.getElementById("message-input");
-const chatMessages = document.getElementById("chat-messages");
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const chatMessages = document.getElementById("messages");
 
-chatForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+sendButton.addEventListener("click", sendMessage);
 
+messageInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+});
+
+async function sendMessage() {
     const message = messageInput.value.trim();
 
     if (!message) return;
 
+    // Remove welcome screen after first message
+    const welcome = document.querySelector(".welcome");
+    if (welcome) {
+        welcome.remove();
+    }
+
     // Show user's message
     const userMessage = document.createElement("div");
-    userMessage.className = "user-message";
+    userMessage.className = "message user";
     userMessage.textContent = message;
     chatMessages.appendChild(userMessage);
 
@@ -19,9 +31,13 @@ chatForm.addEventListener("submit", async (event) => {
 
     // Show thinking message
     const aiMessage = document.createElement("div");
-    aiMessage.className = "ai-message";
+    aiMessage.className = "message ai";
     aiMessage.textContent = "SenatorAI is thinking...";
     chatMessages.appendChild(aiMessage);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    sendButton.disabled = true;
 
     try {
         const response = await fetch("/api/chat", {
@@ -50,5 +66,7 @@ chatForm.addEventListener("submit", async (event) => {
             "Sorry, I couldn't connect to SenatorAI.";
     }
 
+    sendButton.disabled = false;
+
     chatMessages.scrollTop = chatMessages.scrollHeight;
-});
+}
