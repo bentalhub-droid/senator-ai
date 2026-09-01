@@ -1,72 +1,102 @@
-const messageInput = document.getElementById("messageInput");
-const sendButton = document.getElementById("sendButton");
-const chatMessages = document.getElementById("messages");
+const chatForm = document.getElementById("chat-form");
+const messageInput = document.getElementById("message-input");
+const chatMessages = document.getElementById("chat-messages");
 
-sendButton.addEventListener("click", sendMessage);
+if (!chatForm || !messageInput || !chatMessages) {
+    console.error("SenatorAI: Chat elements not found.");
+} else {
 
-messageInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        sendMessage();
-    }
-});
+    chatForm.addEventListener("submit", async (event) => {
 
-async function sendMessage() {
-    const message = messageInput.value.trim();
+        event.preventDefault();
 
-    if (!message) return;
+        const message = messageInput.value.trim();
 
-    // Remove welcome screen after first message
-    const welcome = document.querySelector(".welcome");
-    if (welcome) {
-        welcome.remove();
-    }
+        if (!message) return;
 
-    // Show user's message
-    const userMessage = document.createElement("div");
-    userMessage.className = "message user";
-    userMessage.textContent = message;
-    chatMessages.appendChild(userMessage);
+        // Remove welcome screen after first message
+        const welcome = document.querySelector(".welcome");
 
-    messageInput.value = "";
-
-    // Show thinking message
-    const aiMessage = document.createElement("div");
-    aiMessage.className = "message ai";
-    aiMessage.textContent = "SenatorAI is thinking...";
-    chatMessages.appendChild(aiMessage);
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    sendButton.disabled = true;
-
-    try {
-        const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: message
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.reply) {
-            aiMessage.textContent = data.reply;
-        } else {
-            aiMessage.textContent =
-                data.error || "Sorry, SenatorAI could not generate a response.";
+        if (welcome) {
+            welcome.remove();
         }
 
-    } catch (error) {
-        console.error("CHAT ERROR:", error);
+        // Show user's message
+        const userMessage = document.createElement("div");
+        userMessage.className = "message user";
+        userMessage.textContent = message;
 
-        aiMessage.textContent =
-            "Sorry, I couldn't connect to SenatorAI.";
-    }
+        chatMessages.appendChild(userMessage);
 
-    sendButton.disabled = false;
+        // Clear input
+        messageInput.value = "";
 
+        // Show AI thinking message
+        const aiMessage = document.createElement("div");
+        aiMessage.className = "message ai";
+        aiMessage.textContent = "SenatorAI is thinking...";
+
+        chatMessages.appendChild(aiMessage);
+
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Disable send button
+        const sendButton = chatForm.querySelector("button");
+
+        if (sendButton) {
+            sendButton.disabled = true;
+        }
+
+        try {
+
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: message
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.reply) {
+
+                aiMessage.textContent = data.reply;
+
+            } else {
+
+                aiMessage.textContent =
+                    data.error ||
+                    "Sorry, SenatorAI could not generate a response.";
+
+            }
+
+        } catch (error) {
+
+            console.error("CHAT ERROR:", error);
+
+            aiMessage.textContent =
+                "Sorry, I couldn't connect to SenatorAI.";
+
+        }
+
+        // Enable send button again
+        if (sendButton) {
+            sendButton.disabled = false;
+        }
+
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    });
+
+}
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
