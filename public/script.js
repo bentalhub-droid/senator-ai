@@ -288,8 +288,9 @@ if (chatForm && messageInput && chatMessages) {
 
             if (data.reply) {
 
-                aiMessage.textContent =
-                    data.reply;
+              aiMessage.innerHTML = data.reply
+    .replace(/\n\n/g, "<br><br>")
+    .replace(/\n/g, "<br>");
 
                 // Save AI response
                 saveMessage(
