@@ -38,10 +38,9 @@ if (!chatForm || !messageInput || !chatMessages) {
 
         chatMessages.appendChild(aiMessage);
 
-        // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Disable send button
+        // Disable send button while waiting
         const sendButton = chatForm.querySelector("button");
 
         if (sendButton) {
@@ -67,15 +66,11 @@ if (!chatForm || !messageInput || !chatMessages) {
             const data = await response.json();
 
             if (data.reply) {
-
                 aiMessage.textContent = data.reply;
-
             } else {
-
                 aiMessage.textContent =
                     data.error ||
                     "Sorry, SenatorAI could not generate a response.";
-
             }
 
         } catch (error) {
@@ -84,19 +79,14 @@ if (!chatForm || !messageInput || !chatMessages) {
 
             aiMessage.textContent =
                 "Sorry, I couldn't connect to SenatorAI.";
-
         }
 
-        // Enable send button again
         if (sendButton) {
             sendButton.disabled = false;
         }
 
-        // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
     });
 
-}
-    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
