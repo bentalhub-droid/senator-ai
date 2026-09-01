@@ -1,11 +1,13 @@
 const chatForm = document.getElementById("chat-form");
 const messageInput = document.getElementById("message-input");
 const chatMessages = document.getElementById("chat-messages");
+const newChatButton = document.getElementById("newChat");
 
 if (!chatForm || !messageInput || !chatMessages) {
     console.error("SenatorAI: Chat elements not found.");
 } else {
 
+    // SEND MESSAGE
     chatForm.addEventListener("submit", async (event) => {
 
         event.preventDefault();
@@ -14,7 +16,7 @@ if (!chatForm || !messageInput || !chatMessages) {
 
         if (!message) return;
 
-        // Remove welcome screen after first message
+        // Remove welcome screen
         const welcome = document.querySelector(".welcome");
 
         if (welcome) {
@@ -31,7 +33,7 @@ if (!chatForm || !messageInput || !chatMessages) {
         // Clear input
         messageInput.value = "";
 
-        // Show AI thinking message
+        // Show thinking message
         const aiMessage = document.createElement("div");
         aiMessage.className = "message ai";
         aiMessage.textContent = "SenatorAI is thinking...";
@@ -40,7 +42,6 @@ if (!chatForm || !messageInput || !chatMessages) {
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Disable send button while waiting
         const sendButton = chatForm.querySelector("button");
 
         if (sendButton) {
@@ -66,11 +67,15 @@ if (!chatForm || !messageInput || !chatMessages) {
             const data = await response.json();
 
             if (data.reply) {
+
                 aiMessage.textContent = data.reply;
+
             } else {
+
                 aiMessage.textContent =
                     data.error ||
                     "Sorry, SenatorAI could not generate a response.";
+
             }
 
         } catch (error) {
@@ -79,6 +84,7 @@ if (!chatForm || !messageInput || !chatMessages) {
 
             aiMessage.textContent =
                 "Sorry, I couldn't connect to SenatorAI.";
+
         }
 
         if (sendButton) {
@@ -88,5 +94,46 @@ if (!chatForm || !messageInput || !chatMessages) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
     });
+
+
+    // NEW CHAT
+    if (newChatButton) {
+
+        newChatButton.addEventListener("click", () => {
+
+            // Remove all existing messages
+            chatMessages.innerHTML = "";
+
+            // Add welcome screen again
+            const welcome = document.createElement("div");
+
+            welcome.className = "welcome";
+
+            welcome.innerHTML = `
+                <div class="welcome-icon">
+                    🤖
+                </div>
+
+                <h1>Hello, I'm SenatorAI</h1>
+
+                <p>
+                    Your intelligent AI assistant. Ask me anything.
+                </p>
+            `;
+
+            chatMessages.appendChild(welcome);
+
+            // Clear message box
+            messageInput.value = "";
+
+            // Put cursor back in input
+            messageInput.focus();
+
+            // Scroll to top
+            chatMessages.scrollTop = 0;
+
+        });
+
+    }
 
 }
