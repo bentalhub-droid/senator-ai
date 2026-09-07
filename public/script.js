@@ -138,23 +138,107 @@ function renderChatHistory() {
 
     chats.forEach((chat) => {
 
+        // Chat row
         const chatItem = document.createElement("div");
 
         chatItem.className = "chat-history-item";
 
-        chatItem.textContent = chat.title;
+        // Chat title
+        const chatTitle = document.createElement("span");
 
-        chatItem.dataset.id = chat.id;
+        chatTitle.className = "chat-title";
 
-        chatItem.addEventListener("click", () => {
+        chatTitle.textContent = chat.title;
+
+        // Three-dot button
+        const menuButton = document.createElement("button");
+
+        menuButton.className = "chat-menu-button";
+
+        menuButton.textContent = "⋯";
+
+        menuButton.title = "Chat options";
+
+        // Delete menu
+        const deleteMenu = document.createElement("div");
+
+        deleteMenu.className = "chat-delete-menu";
+
+        deleteMenu.textContent = "🗑️ Delete";
+
+        // Load chat when title is clicked
+        chatTitle.addEventListener("click", () => {
 
             loadChat(chat.id);
 
         });
 
+        // Show/hide delete menu
+        menuButton.addEventListener("click", (event) => {
+
+            event.stopPropagation();
+
+            // Close other menus
+            document
+                .querySelectorAll(".chat-delete-menu.show")
+                .forEach((menu) => {
+                    menu.classList.remove("show");
+                });
+
+            deleteMenu.classList.toggle("show");
+
+        });
+
+        // Delete chat
+        deleteMenu.addEventListener("click", (event) => {
+
+            event.stopPropagation();
+
+            deleteChat(chat.id);
+
+        });
+
+        chatItem.appendChild(chatTitle);
+
+        chatItem.appendChild(menuButton);
+
+        chatItem.appendChild(deleteMenu);
+
         chatHistory.appendChild(chatItem);
 
     });
+
+}
+// ===============================
+// DELETE CHAT
+// ===============================
+
+function deleteChat(chatId) {
+
+    const confirmed = confirm(
+        "Are you sure you want to delete this chat?"
+    );
+
+    if (!confirmed) return;
+
+    chats = chats.filter(
+        (chat) => chat.id !== chatId
+    );
+
+    saveChats();
+
+    // If deleting the current chat
+    if (currentChatId === chatId) {
+
+        currentChatId = null;
+
+        displayWelcome();
+
+        messageInput.value = "";
+
+    }
+
+    renderChatHistory();
 
 }
 

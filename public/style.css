@@ -433,3 +433,66 @@ body {
     }
 
 }
+/* =========================
+   CHAT DELETE MENU
+========================= */
+
+.chat-history-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chat-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.chat-menu-button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    color: #777 !important;
+    font-size: 18px !important;
+    cursor: pointer;
+    border-radius: 6px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-menu-button:hover {
+    background: #e5e5e5 !important;
+    color: #222 !important;
+}
+
+.chat-delete-menu {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 38px;
+    z-index: 2000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #d11a2a;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.chat-delete-menu.show {
+    display: block;
+}
+
+.chat-delete-menu:hover {
+    background: #f5f5f5;
+}
