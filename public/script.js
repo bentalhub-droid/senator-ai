@@ -1,11 +1,61 @@
 const chatForm = document.getElementById("chat-form");
 const messageInput = document.getElementById("message-input");
 const chatMessages = document.getElementById("chat-messages");
+
 const newChatButton = document.getElementById("newChat");
-const chatHistory = document.querySelector(".chat-history");
+const chatHistory = document.getElementById("chat-history-list");
+
+const sidebar = document.getElementById("sidebar");
+const menuButton = document.getElementById("menuButton");
+const closeSidebarButton = document.getElementById("closeSidebar");
+const sidebarOverlay = document.getElementById("sidebar-overlay");
 
 let chats = JSON.parse(localStorage.getItem("senatorAI_chats")) || [];
 let currentChatId = null;
+
+
+// ===============================
+// MOBILE SIDEBAR
+// ===============================
+
+function openSidebar() {
+    if (!sidebar) return;
+
+    sidebar.classList.add("open");
+
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.add("show");
+    }
+}
+
+
+function closeSidebar() {
+    if (!sidebar) return;
+
+    sidebar.classList.remove("open");
+
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove("show");
+    }
+}
+
+
+// Open menu
+if (menuButton) {
+    menuButton.addEventListener("click", openSidebar);
+}
+
+
+// Close menu
+if (closeSidebarButton) {
+    closeSidebarButton.addEventListener("click", closeSidebar);
+}
+
+
+// Click outside sidebar
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener("click", closeSidebar);
+}
 
 
 // ===============================
@@ -30,6 +80,9 @@ function createNewChat() {
     renderChatHistory();
 
     messageInput.value = "";
+
+    closeSidebar();
+
     messageInput.focus();
 }
 
@@ -39,7 +92,12 @@ function createNewChat() {
 // ===============================
 
 function saveChats() {
-    localStorage.setItem("senatorAI_chats", JSON.stringify(chats));
+
+    localStorage.setItem(
+        "senatorAI_chats",
+        JSON.stringify(chats)
+    );
+
 }
 
 
@@ -64,6 +122,7 @@ function displayWelcome() {
 
         </div>
     `;
+
 }
 
 
@@ -75,9 +134,7 @@ function renderChatHistory() {
 
     if (!chatHistory) return;
 
-    chatHistory.innerHTML = `
-        <p>Recent Chats</p>
-    `;
+    chatHistory.innerHTML = "";
 
     chats.forEach((chat) => {
 
@@ -90,11 +147,15 @@ function renderChatHistory() {
         chatItem.dataset.id = chat.id;
 
         chatItem.addEventListener("click", () => {
+
             loadChat(chat.id);
+
         });
 
         chatHistory.appendChild(chatItem);
+
     });
+
 }
 
 
@@ -104,7 +165,9 @@ function renderChatHistory() {
 
 function loadChat(chatId) {
 
-    const chat = chats.find((item) => item.id === chatId);
+    const chat = chats.find(
+        (item) => item.id === chatId
+    );
 
     if (!chat) return;
 
@@ -114,39 +177,55 @@ function loadChat(chatId) {
 
     chat.messages.forEach((message) => {
 
-        const messageElement = document.createElement("div");
+        const messageElement =
+            document.createElement("div");
 
         messageElement.className =
             `message ${message.role}`;
 
-        messageElement.textContent = message.content;
+        messageElement.textContent =
+            message.content;
 
-        chatMessages.appendChild(messageElement);
+        chatMessages.appendChild(
+            messageElement
+        );
+
     });
 
     messageInput.value = "";
 
+    closeSidebar();
+
     messageInput.focus();
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
 }
 
 
 // ===============================
-// SAVE MESSAGE TO CURRENT CHAT
+// SAVE MESSAGE
 // ===============================
 
 function saveMessage(role, content) {
 
     if (!currentChatId) {
 
-        currentChatId = Date.now().toString();
+        currentChatId =
+            Date.now().toString();
 
         chats.unshift({
+
             id: currentChatId,
-            title: content.substring(0, 35),
+
+            title:
+                content.substring(0, 35),
+
             messages: []
+
         });
+
     }
 
     const chat = chats.find(
@@ -156,11 +235,15 @@ function saveMessage(role, content) {
     if (!chat) return;
 
     chat.messages.push({
+
         role: role,
+
         content: content
+
     });
 
-    // Use first user message as chat title
+
+    // First user message becomes title
     if (
         role === "user" &&
         chat.title === "New Chat"
@@ -170,11 +253,14 @@ function saveMessage(role, content) {
             content.length > 35
                 ? content.substring(0, 35) + "..."
                 : content;
+
     }
+
 
     saveChats();
 
     renderChatHistory();
+
 }
 
 
@@ -182,154 +268,257 @@ function saveMessage(role, content) {
 // SEND MESSAGE
 // ===============================
 
-if (chatForm && messageInput && chatMessages) {
+if (
+    chatForm &&
+    messageInput &&
+    chatMessages
+) {
 
-    chatForm.addEventListener("submit", async (event) => {
+    chatForm.addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const message = messageInput.value.trim();
+            const message =
+                messageInput.value.trim();
 
-        if (!message) return;
-
-
-        // Remove welcome screen
-        const welcome = document.querySelector(".welcome");
-
-        if (welcome) {
-            welcome.remove();
-        }
-
-
-        // Create chat automatically if needed
-        if (!currentChatId) {
-
-            currentChatId = Date.now().toString();
-
-            chats.unshift({
-                id: currentChatId,
-                title: message.substring(0, 35),
-                messages: []
-            });
-
-            saveChats();
-        }
+            if (!message) return;
 
 
-        // Show user message
-        const userMessage = document.createElement("div");
+            // Remove welcome screen
+            const welcome =
+                document.querySelector(".welcome");
 
-        userMessage.className = "message user";
-
-        userMessage.textContent = message;
-
-        chatMessages.appendChild(userMessage);
-
-
-        // Save user message
-        saveMessage("user", message);
+            if (welcome) {
+                welcome.remove();
+            }
 
 
-        // Clear input
-        messageInput.value = "";
+            // Create chat automatically
+            if (!currentChatId) {
 
+                currentChatId =
+                    Date.now().toString();
 
-        // Show AI thinking
-        const aiMessage = document.createElement("div");
+                chats.unshift({
 
-        aiMessage.className = "message ai";
+                    id: currentChatId,
 
-        aiMessage.textContent =
-            "SenatorAI is thinking...";
+                    title:
+                        message.substring(0, 35),
 
-        chatMessages.appendChild(aiMessage);
+                    messages: []
 
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
+                });
 
-
-        // Disable button
-        const sendButton =
-            chatForm.querySelector("button");
-
-        if (sendButton) {
-            sendButton.disabled = true;
-        }
-
-
-        try {
-
-            const response = await fetch("/api/chat", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    message: message
-                })
-
-            });
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    `Server returned ${response.status}`
-                );
+                saveChats();
 
             }
 
 
-            const data = await response.json();
+            // ===============================
+            // USER MESSAGE
+            // ===============================
 
+            const userMessage =
+                document.createElement("div");
 
-            if (data.reply) {
+            userMessage.className =
+                "message user";
 
-              aiMessage.innerHTML = data.reply
-    .replace(/\n\n/g, "<br><br>")
-    .replace(/\n/g, "<br>");
+            userMessage.textContent =
+                message;
 
-                // Save AI response
-                saveMessage(
-                    "ai",
-                    data.reply
-                );
-
-            } else {
-
-                const errorMessage =
-                    data.error ||
-                    "Sorry, SenatorAI could not generate a response.";
-
-                aiMessage.textContent =
-                    errorMessage;
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "CHAT ERROR:",
-                error
+            chatMessages.appendChild(
+                userMessage
             );
 
+
+            // Save user message
+            saveMessage(
+                "user",
+                message
+            );
+
+
+            // Clear input
+            messageInput.value = "";
+
+
+            // ===============================
+            // AI THINKING
+            // ===============================
+
+            const aiMessage =
+                document.createElement("div");
+
+            aiMessage.className =
+                "message ai";
+
             aiMessage.textContent =
-                "Sorry, I couldn't connect to SenatorAI.";
+                "SenatorAI is thinking...";
 
-        }
+            chatMessages.appendChild(
+                aiMessage
+            );
 
 
-        if (sendButton) {
-            sendButton.disabled = false;
-        }
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
 
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
+// Disable send button
+const sendButton =
+    chatForm.querySelector(".send-button");
+
+            if (sendButton) {
+                sendButton.disabled = true;
+            }
+
+
+            // ===============================
+            // SEND TO SERVER
+            // ===============================
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/chat",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                message: message
+                            })
+
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Server returned ${response.status}`
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                // ===============================
+                // AI RESPONSE
+                // ===============================
+if (data.reply) {
+
+   aiMessage.innerHTML = data.reply
+    // Escape HTML
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+
+    // Bold
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+
+    // Headings
+    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+
+    // Bullet points
+    .replace(/^- (.*)$/gm, "<li>$1</li>")
+
+    // Numbered lists
+    .replace(/^\d+\. (.*)$/gm, "<li>$1</li>")
+
+    // Paragraph spacing
+    .replace(/\n\n/g, "<br><br>")
+
+    // Single line breaks
+    .replace(/\n/g, "<br>");
+
+    // ===============================
+    // SPEAK RESPONSE BUTTON
+    // ===============================
+
+    const speakButton =
+        document.createElement("button");
+
+    speakButton.className = "speak-button";
+    speakButton.textContent = "🔊";
+    speakButton.title = "Read response aloud";
+
+    speakButton.addEventListener("click", () => {
+
+        // Stop anything currently being spoken
+        window.speechSynthesis.cancel();
+
+        const speech =
+            new SpeechSynthesisUtterance(
+                data.reply
+            );
+
+        speech.lang = "en-NG";
+        speech.rate = 1;
+        speech.pitch = 1;
+
+        window.speechSynthesis.speak(speech);
 
     });
+
+    aiMessage.appendChild(speakButton);
+
+
+    // Save AI response
+    saveMessage(
+        "ai",
+        data.reply
+    );
+
+ } else {
+
+                    const errorMessage =
+                        data.error ||
+                        "Sorry, SenatorAI could not generate a response.";
+
+                    aiMessage.textContent =
+                        errorMessage;
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "CHAT ERROR:",
+                    error
+                );
+
+                aiMessage.textContent =
+                    "Sorry, I couldn't connect to SenatorAI.";
+
+            }
+
+
+            // Enable button
+            if (sendButton) {
+                sendButton.disabled = false;
+            }
+
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+
+        }
+    );
 
 }
 
@@ -349,22 +538,82 @@ if (newChatButton) {
 
 
 // ===============================
-// LOAD CHAT HISTORY ON STARTUP
+// LOAD CHAT HISTORY
 // ===============================
 
 renderChatHistory();
 
 
 // ===============================
-// START WITH A NEW CHAT
+// START SCREEN
 // ===============================
 
-if (chats.length === 0) {
+displayWelcome();
 
-    displayWelcome();
+// ===============================
+// VOICE INPUT
+// ===============================
 
-} else {
+const micButton = document.getElementById("mic-button");
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-    displayWelcome();
+if (SpeechRecognition && micButton) {
+
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    // Nigerian English
+    recognition.lang = "en-NG";
+
+    micButton.addEventListener("click", () => {
+
+        try {
+            recognition.start();
+
+            micButton.classList.add("recording");
+            micButton.textContent = "⏹️";
+
+        } catch (error) {
+            console.log("Voice recognition already running.");
+        }
+
+    });
+
+    recognition.onresult = (event) => {
+
+        const transcript =
+            event.results[0][0].transcript;
+
+        messageInput.value = transcript;
+
+        // Automatically submit the message
+        document.getElementById("chat-form").requestSubmit();
+    };
+
+    recognition.onend = () => {
+
+        micButton.classList.remove("recording");
+        micButton.textContent = "🎙️";
+
+    };
+
+    recognition.onerror = (event) => {
+
+        console.log("Voice recognition error:", event.error);
+
+        micButton.classList.remove("recording");
+        micButton.textContent = "🎙️";
+
+    };
+
+} else if (micButton) {
+
+    micButton.disabled = true;
+    micButton.title =
+        "Voice input is not supported in this browser";
 
 }

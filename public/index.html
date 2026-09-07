@@ -11,10 +11,26 @@
 
     <div class="app">
 
-        <aside class="sidebar">
+        <!-- Mobile overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-            <div class="logo">
-                🤖 SenatorAI
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+
+            <div class="sidebar-header">
+
+                <div class="logo">
+                    🤖 SenatorAI
+                </div>
+
+                <button
+                    id="closeSidebar"
+                    class="close-sidebar"
+                    aria-label="Close menu"
+                >
+                    ×
+                </button>
+
             </div>
 
             <button id="newChat" class="new-chat">
@@ -22,18 +38,39 @@
             </button>
 
             <div class="chat-history">
+
                 <p>Recent Chats</p>
+
+                <div id="chat-history-list"></div>
+
             </div>
 
         </aside>
 
+
+        <!-- Main chat area -->
         <main class="main">
 
             <header class="topbar">
+
+                <button
+                    id="menuButton"
+                    class="menu-button"
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
+
                 <h2>SenatorAI</h2>
+
             </header>
 
-            <section id="chat-messages" class="messages">
+
+            <!-- Messages -->
+            <section
+                id="chat-messages"
+                class="messages"
+            >
 
                 <div class="welcome">
 
@@ -51,9 +88,14 @@
 
             </section>
 
+
+            <!-- Input area -->
             <div class="input-container">
 
-                <form id="chat-form" class="input-box">
+                <form
+                    id="chat-form"
+                    class="input-box"
+                >
 
                     <input
                         type="text"
@@ -62,11 +104,29 @@
                         autocomplete="off"
                     >
 
-                    <button type="submit">
-                        Send
+
+                    <!-- Microphone -->
+                    <button
+                        type="button"
+                        id="mic-button"
+                        class="mic-button"
+                        title="Voice input"
+                    >
+                        🎙️
+                    </button>
+
+
+                    <!-- Send -->
+                    <button
+                        type="submit"
+                        class="send-button"
+                        title="Send message"
+                    >
+                        ↑
                     </button>
 
                 </form>
+
 
                 <p class="disclaimer">
                     SenatorAI can make mistakes. Check important information.
@@ -77,6 +137,151 @@
         </main>
 
     </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenatorAI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- Mobile overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+
+            <div class="sidebar-header">
+
+                <div class="logo">
+                    🤖 SenatorAI
+                </div>
+
+                <button
+                    id="closeSidebar"
+                    class="close-sidebar"
+                    aria-label="Close menu"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <button id="newChat" class="new-chat">
+                + New Chat
+            </button>
+
+            <div class="chat-history">
+
+                <p>Recent Chats</p>
+
+                <div id="chat-history-list"></div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- Main chat area -->
+        <main class="main">
+
+            <header class="topbar">
+
+                <button
+                    id="menuButton"
+                    class="menu-button"
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
+
+                <h2>SenatorAI</h2>
+
+            </header>
+
+
+            <!-- Messages -->
+            <section
+                id="chat-messages"
+                class="messages"
+            >
+
+                <div class="welcome">
+
+                    <div class="welcome-icon">
+                        🤖
+                    </div>
+
+                    <h1>Hello, I'm SenatorAI</h1>
+
+                    <p>
+                        Your intelligent AI assistant. Ask me anything.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- Input area -->
+            <div class="input-container">
+
+                <form
+                    id="chat-form"
+                    class="input-box"
+                >
+
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Message SenatorAI..."
+                        autocomplete="off"
+                    >
+
+
+                    <!-- Microphone -->
+                    <button
+                        type="button"
+                        id="mic-button"
+                        class="mic-button"
+                        title="Voice input"
+                    >
+                        🎙️
+                    </button>
+
+
+                    <!-- Send -->
+                    <button
+                        type="submit"
+                        class="send-button"
+                        title="Send message"
+                    >
+                        ↑
+                    </button>
+
+                </form>
+
+
+                <p class="disclaimer">
+                    SenatorAI can make mistakes. Check important information.
+                </p>
+
+            </div>
+
+        </main>
+
+    </div>
+
 
     <script src="script.js"></script>
 

@@ -9,6 +9,7 @@ body {
     background: #ffffff;
     color: #2d2d2d;
     height: 100vh;
+    overflow: hidden;
 }
 
 .app {
@@ -17,7 +18,9 @@ body {
 }
 
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar {
     width: 260px;
@@ -26,6 +29,14 @@ body {
     padding: 14px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .logo {
@@ -33,6 +44,15 @@ body {
     font-weight: 600;
     padding: 12px;
     margin-bottom: 12px;
+}
+
+.close-sidebar {
+    display: none;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    color: #555;
 }
 
 .new-chat {
@@ -52,6 +72,7 @@ body {
 
 .chat-history {
     margin-top: 25px;
+    overflow-y: auto;
 }
 
 .chat-history p {
@@ -60,18 +81,43 @@ body {
     padding: 10px;
 }
 
+#chat-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-/* MAIN */
+.chat-history-item {
+    padding: 10px;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-history-item:hover {
+    background: #e9e9e9;
+}
+
+
+/* =========================
+   MAIN
+========================= */
 
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
     height: 100vh;
+    min-width: 0;
 }
 
 
-/* TOP BAR */
+/* =========================
+   TOP BAR
+========================= */
 
 .topbar {
     height: 60px;
@@ -79,6 +125,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 25px;
+    position: relative;
 }
 
 .topbar h2 {
@@ -86,8 +133,20 @@ body {
     font-weight: 600;
 }
 
+.menu-button {
+    display: none;
+    border: none;
+    background: transparent;
+    font-size: 23px;
+    cursor: pointer;
+    margin-right: 12px;
+    padding: 5px;
+}
 
-/* CHAT */
+
+/* =========================
+   CHAT
+========================= */
 
 .messages {
     flex: 1;
@@ -117,9 +176,13 @@ body {
 }
 
 
-/* MESSAGES */
+/* =========================
+   MESSAGES
+========================= */
 
-.message {
+.message,
+.user-message,
+.ai-message {
     max-width: 800px;
     margin: 0 auto 25px;
     padding: 14px 18px;
@@ -127,17 +190,21 @@ body {
     font-size: 15px;
 }
 
-.user {
+.user,
+.user-message {
     background: #f4f4f4;
     border-radius: 12px;
 }
 
-.ai {
+.ai,
+.ai-message {
     background: transparent;
 }
 
 
-/* INPUT */
+/* =========================
+   INPUT
+========================= */
 
 .input-container {
     padding: 15px 20px 25px;
@@ -191,12 +258,76 @@ body {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE SIDEBAR
+========================= */
+
+.sidebar-overlay {
+    display: none;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 700px) {
 
+    body {
+        overflow: hidden;
+    }
+
+    /* Sidebar becomes a drawer */
     .sidebar {
-        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.12);
+    }
+
+    /* When JavaScript adds this class */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .close-sidebar {
+        display: block;
+    }
+
+    /* Dark background behind sidebar */
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* Show hamburger */
+    .menu-button {
+        display: block;
+    }
+
+    .topbar {
+        height: 56px;
+        padding: 0 15px;
+    }
+
+    .topbar h2 {
+        font-size: 16px;
+    }
+
+    .messages {
+        padding: 15px;
     }
 
     .welcome {
@@ -207,26 +338,98 @@ body {
         font-size: 24px;
     }
 
-    .messages {
-        padding: 15px;
+    .welcome-icon {
+        font-size: 40px;
+    }
+
+    .input-container {
+        padding: 10px 12px 18px;
+    }
+
+    .input-box {
+        border-radius: 14px;
+    }
+
+    .input-box input {
+        font-size: 16px;
+    }
+
+    .disclaimer {
+        font-size: 10px;
     }
 
 }
-.user-message {
-    max-width: 800px;
-    margin: 0 auto 25px;
-    padding: 14px 18px;
-    line-height: 1.6;
-    font-size: 15px;
-    background: #f4f4f4;
-    border-radius: 12px;
+/* =========================
+   VOICE INPUT
+========================= */
+
+.input-box .mic-button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border: none;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #222;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    padding: 0;
 }
 
-.ai-message {
-    max-width: 800px;
-    margin: 0 auto 25px;
-    padding: 14px 18px;
-    line-height: 1.6;
-    font-size: 15px;
-    background: transparent;
+.input-box .mic-button:hover {
+    background: #e5e5e5;
+}
+
+.input-box .mic-button.recording {
+    background: #ff4d4d;
+    color: white;
+    animation: pulse 1s infinite;
+}
+
+
+.input-box .send-button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border: none;
+    border-radius: 50%;
+    background: #000;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+    padding: 0;
+}
+
+.input-box .send-button:hover {
+    background: #222;
+}
+
+.input-box .send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+@keyframes pulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
 }
