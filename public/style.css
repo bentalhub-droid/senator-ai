@@ -475,22 +475,33 @@ body {
 
 .chat-delete-menu {
     display: none;
-    position: absolute;
-    right: 5px;
-    top: 38px;
-    z-index: 2000;
-    background: white;
+
+    position: fixed;
+
+    z-index: 999999;
+
+    background: #ffffff;
+    color: #d11a2a;
+
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 9px 12px;
+
+   padding: 10px 18px;
+min-width: 100px;
+box-sizing: border-box;
+
     font-size: 13px;
-    color: #d11a2a;
+    font-weight: 500;
+
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+    white-space: nowrap;
 }
 
 .chat-delete-menu.show {
-    display: block;
+    display: block !important;
 }
 
 .chat-delete-menu:hover {

@@ -174,21 +174,39 @@ function renderChatHistory() {
         });
 
         // Show/hide delete menu
-        menuButton.addEventListener("click", (event) => {
+    // Show/hide delete menu
 
-            event.stopPropagation();
+menuButton.addEventListener("click", (event) => {
 
-            // Close other menus
-            document
-                .querySelectorAll(".chat-delete-menu.show")
-                .forEach((menu) => {
-                    menu.classList.remove("show");
-                });
+    event.stopPropagation();
 
-            deleteMenu.classList.toggle("show");
-
+    // Close other menus
+    document
+        .querySelectorAll(".chat-delete-menu.show")
+        .forEach((menu) => {
+            menu.classList.remove("show");
         });
 
+    deleteMenu.classList.toggle("show");
+
+    if (deleteMenu.classList.contains("show")) {
+
+        const buttonPosition =
+            menuButton.getBoundingClientRect();
+
+        deleteMenu.style.position = "fixed";
+
+        deleteMenu.style.top =
+            (buttonPosition.top + 5) + "px";
+
+        deleteMenu.style.left =
+    (buttonPosition.left - 120) + "px";
+
+        deleteMenu.style.zIndex = "999999";
+
+    }
+
+});
         // Delete chat
         deleteMenu.addEventListener("click", (event) => {
 
@@ -478,10 +496,12 @@ const sendButton =
                                     "application/json"
                             },
 
-                            body: JSON.stringify({
-                                message: message
-                            })
-
+                         body: JSON.stringify({
+    message: message,
+    history: chats.find(
+        (chat) => chat.id === currentChatId
+    )?.messages.slice(0, -1) || []
+})
                         }
                     );
 
@@ -563,10 +583,10 @@ if (data.reply) {
 
 
     // Save AI response
-    saveMessage(
-        "ai",
-        data.reply
-    );
+   saveMessage(
+    "assistant",
+    data.reply
+);
 
  } else {
 
