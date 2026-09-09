@@ -507,3 +507,10 @@ box-sizing: border-box;
 .chat-delete-menu:hover {
     background: #f5f5f5;
 }
+.generated-image {
+    display: block;
+    width: min(100%, 700px);
+    height: auto;
+    border-radius: 16px;
+    margin-top: 8px;
+}

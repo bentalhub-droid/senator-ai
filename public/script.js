@@ -522,34 +522,44 @@ const sendButton =
                 // ===============================
                 // AI RESPONSE
                 // ===============================
-if (data.reply) {
+if (data.type === "image" && data.image) {
 
-   aiMessage.innerHTML = data.reply
-    // Escape HTML
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
+    aiMessage.innerHTML = "";
 
-    // Bold
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    const image = document.createElement("img");
 
-    // Headings
-    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+    image.src = data.image;
+    image.alt = message;
+    image.className = "generated-image";
 
-    // Bullet points
-    .replace(/^- (.*)$/gm, "<li>$1</li>")
+    aiMessage.appendChild(image);
 
-    // Numbered lists
-    .replace(/^\d+\. (.*)$/gm, "<li>$1</li>")
+    saveMessage(
+        "assistant",
+        "[Generated image]"
+    );
 
-    // Paragraph spacing
-    .replace(/\n\n/g, "<br><br>")
+} else if (data.reply) {
 
-    // Single line breaks
-    .replace(/\n/g, "<br>");
-
+    aiMessage.innerHTML = data.reply
+        // Escape HTML
+        .replace(/&/g, "&amp;")
+        .replace(/\</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        // Headings
+        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+        // Bullet points
+        .replace(/^- (.*)$/gm, "<li>$1</li>")
+        // Numbered lists
+        .replace(/^\d+\.\s(.*)$/gm, "<li>$1</li>")
+        // Paragraph spacing
+        .replace(/\n\n/g, "<br><br>")
+        // Single line breaks
+        .replace(/\n/g, "<br>");
     // ===============================
     // SPEAK RESPONSE BUTTON
     // ===============================

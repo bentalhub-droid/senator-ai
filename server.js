@@ -10,6 +10,11 @@ console.log(
     process.env.GROQ_API_KEY ? "YES" : "NO"
 );
 
+console.log(
+    "OpenAI key loaded:",
+    process.env.OPENAI_API_KEY ? "YES" : "NO"
+);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,29 +22,123 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
+// ===============================
+// GROQ CLIENT
+// ===============================
 const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: "https://api.groq.com/openai/v1"
 });
 
+// ===============================
+// OPENAI CLIENT
+// ===============================
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
+
+// ===============================
+// CHAT ROUTE
+// ===============================
 app.post("/api/chat", async (req, res) => {
+
     try {
+
         const { message, history = [] } = req.body;
 
-        if (!message) {
+        // ===============================
+        // CHECK MESSAGE
+        // ===============================
+        if (!message || typeof message !== "string") {
+
             return res.status(400).json({
                 error: "Please provide a message."
             });
+
         }
 
+        console.log("USER MESSAGE:", message);
+
+        // ===============================
+        // DETECT IMAGE REQUEST
+        // ===============================
+        const imageRequest =
+            /\b(create|generate|make|draw|design|produce|show|visualize)\b.*\b(image|picture|photo|illustration|poster|logo|artwork|map)\b/i.test(message)
+            ||
+            /\b(image|picture|photo|illustration|poster|logo|artwork|map)\b.*\b(of|showing|with)\b/i.test(message);
+
+        console.log("IMAGE REQUEST:", imageRequest);
+
+        // ===============================
+        // IMAGE GENERATION
+        // ===============================
+        if (imageRequest) {
+
+            console.log("Sending request to OpenAI image generation...");
+
+            try {
+
+                const result = await openai.images.generate({
+                    model: "gpt-image-2",
+                    prompt: message,
+                    size: "1024x1024"
+                });
+
+                const imageBase64 =
+                    result.data?.[0]?.b64_json;
+
+                if (!imageBase64) {
+
+                    throw new Error(
+                        "OpenAI did not return image data."
+                    );
+
+                }
+
+                console.log("IMAGE GENERATED SUCCESSFULLY");
+
+                return res.json({
+
+                    type: "image",
+
+                    image:
+                        `data:image/png;base64,${imageBase64}`
+
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "IMAGE GENERATION ERROR:",
+                    error
+                );
+
+                return res.status(500).json({
+
+                    error:
+                        "Unable to generate the image. Please check the OpenAI API key and image model access."
+
+                });
+
+            }
+
+        }
+
+        // ===============================
+        // NORMAL CHAT
+        // ===============================
+
         const messages = [
+
             {
                 role: "system",
+
                 content: `You are SenatorAI, a helpful, intelligent, friendly and natural AI assistant.
 
 Your goal is to communicate naturally and clearly, like a high-quality modern AI assistant.
 
 RESPONSE STYLE:
+
 - Answer the user's question directly.
 - Keep answers concise by default.
 - Use simple, natural language.
@@ -55,62 +154,113 @@ RESPONSE STYLE:
 - If the user says "explain that", "break it down", "tell me more", "what about the first one", or similar, refer to the relevant previous message instead of asking what they mean.
 - If the user asks a simple question, give a simple answer.
 - If the user asks for more detail, then provide more detail.
-- Never output raw Markdown table formatting such as | unless the user specifically asks for a table.
-- Do not put unnecessary backslashes before Markdown characters.
 - Be conversational and helpful rather than robotic.
 - If you don't know something, say so honestly.
 
 CREATOR INFORMATION:
+
 If anyone asks who created you, who built you, who made you, who is your creator, or where you were created, respond:
 
 "I was created by Agwuokorosenator from Focus High School, Lugbe, Abuja, Nigeria and he is a very talented coder."
 
 Do not claim that OpenAI, Groq, or any other AI company created you.`
             }
+
         ];
 
-        // Add previous conversation
+        // ===============================
+        // ADD PREVIOUS CONVERSATION
+        // ===============================
+
         if (Array.isArray(history)) {
+
             history.forEach((item) => {
 
-             if (
-    item &&
-    (item.role === "user" || item.role === "assistant" || item.role === "ai") &&
-    typeof item.content === "string"
-) {
-                messages.push({
-    role: item.role === "ai" ? "assistant" : item.role,
-    content: item.content
-});
+                if (
+                    item &&
+                    (
+                        item.role === "user" ||
+                        item.role === "assistant" ||
+                        item.role === "ai"
+                    ) &&
+                    typeof item.content === "string"
+                ) {
+
+                    messages.push({
+
+                        role:
+                            item.role === "ai"
+                                ? "assistant"
+                                : item.role,
+
+                        content: item.content
+
+                    });
+
                 }
 
             });
+
         }
 
-        // Add current message
+        // ===============================
+        // ADD CURRENT MESSAGE
+        // ===============================
+
         messages.push({
+
             role: "user",
+
             content: message
+
         });
 
-        const completion = await client.chat.completions.create({
-            model: "openai/gpt-oss-20b",
-            messages: messages
-        });
+        // ===============================
+        // SEND TO GROQ
+        // ===============================
+
+        const completion =
+            await client.chat.completions.create({
+
+                model: "openai/gpt-oss-20b",
+
+                messages: messages
+
+            });
 
         res.json({
-            reply: completion.choices[0].message.content
+
+            reply:
+                completion.choices[0].message.content
+
         });
 
     } catch (error) {
-        console.error("AI ERROR:", error);
+
+        console.error(
+            "AI ERROR:",
+            error
+        );
 
         res.status(500).json({
-            error: "Unable to connect to SenatorAI."
+
+            error:
+                "Unable to connect to SenatorAI."
+
         });
+
     }
+
 });
 
+// ===============================
+// START SERVER
+// ===============================
+
 app.listen(PORT, () => {
-    console.log(`SenatorAI is running at http://localhost:${PORT}`);
+
+    console.log(
+        `SenatorAI is running at http://localhost:${PORT}`
+    );
+
 });
