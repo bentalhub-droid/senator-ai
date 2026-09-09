@@ -11,8 +11,8 @@ console.log(
 );
 
 console.log(
-    "OpenAI key loaded:",
-    process.env.OPENAI_API_KEY ? "YES" : "NO"
+    "Pollinations key loaded:",
+    process.env.POLLINATIONS_API_KEY ? "YES" : "NO"
 );
 
 const app = express();
@@ -28,13 +28,6 @@ app.use(express.static("public"));
 const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY,
     baseURL: "https://api.groq.com/openai/v1"
-});
-
-// ===============================
-// OPENAI CLIENT
-// ===============================
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
 });
 
 // ===============================
@@ -70,39 +63,26 @@ app.post("/api/chat", async (req, res) => {
         console.log("IMAGE REQUEST:", imageRequest);
 
         // ===============================
-        // IMAGE GENERATION
+        // IMAGE GENERATION - POLLINATIONS
         // ===============================
         if (imageRequest) {
 
-            console.log("Sending request to OpenAI image generation...");
+            console.log("Sending request to Pollinations image generation...");
 
             try {
 
-                const result = await openai.images.generate({
-                    model: "gpt-image-2",
-                    prompt: message,
-                    size: "1024x1024"
-                });
+                const prompt = encodeURIComponent(message);
 
-                const imageBase64 =
-                    result.data?.[0]?.b64_json;
+                const imageUrl =
+                    `https://gen.pollinations.ai/image/${prompt}?model=flux&width=1024&height=1024&key=${process.env.POLLINATIONS_API_KEY}`;
 
-                if (!imageBase64) {
-
-                    throw new Error(
-                        "OpenAI did not return image data."
-                    );
-
-                }
-
-                console.log("IMAGE GENERATED SUCCESSFULLY");
+                console.log("Pollinations image URL created");
 
                 return res.json({
 
                     type: "image",
 
-                    image:
-                        `data:image/png;base64,${imageBase64}`
+                    image: imageUrl
 
                 });
 
@@ -116,7 +96,7 @@ app.post("/api/chat", async (req, res) => {
                 return res.status(500).json({
 
                     error:
-                        "Unable to generate the image. Please check the OpenAI API key and image model access."
+                        "Unable to generate the image."
 
                 });
 
